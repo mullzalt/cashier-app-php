@@ -1,0 +1,58 @@
+enum user_role {
+  cashier
+  admin
+}
+
+Table users {
+  id serial [primary key]
+  username varchar [not null, unique]
+  password_hashed text [not null]
+  role user_role [not null, default: "cashier"] 
+}
+
+Table products {
+  id serial [primary key]
+  name varchar [not null]
+  code text [not null]
+  price double [not null]
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null, default: `now()`] 
+}
+
+Table product_dicounts {
+  id serial [primary key]
+  product_id serial [not null]
+  percentage int [not null, default: 0]
+  fixed double [not null, default: 0]
+}
+
+Table product_stocks {
+  id serial [primary key]
+  product_id serial
+  quatity int
+  updated_at timestamp [not null, default: `now()`]
+}
+
+Table transactions {
+  id serial [primary key]
+  cashier_id serial [not null]
+  created_at timestamp [not null, default: `now()`]
+  total double [not null, default: 0]
+}
+
+Table transaction_details {
+  id serial [primary key]
+  transaction_id serial [not null]
+  product_id serial [not null]
+  product_price double [not null]
+  discount double [not null, default: 0]
+  quantity int [not null, default: 1]
+  sub_total double [not null, default: 0]
+}
+
+Ref: product_dicounts.product_id > products.id
+Ref: product_stocks.product_id > products.id
+Ref: transactions.cashier_id > users.id
+
+Ref: transaction_details.transaction_id > transactions.id
+Ref: transaction_details.product_id > products.id
