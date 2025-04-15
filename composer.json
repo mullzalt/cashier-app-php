@@ -1,0 +1,15 @@
+{
+    "name": "mullzalt/cashier-app",
+    "autoload": {
+        "psr-4": {
+            "Mullzalt\\CashierApp\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "mullzalt",
+            "email": "rizki.d.mulya@gmail.com"
+        }
+    ],
+    "require": {}
+}

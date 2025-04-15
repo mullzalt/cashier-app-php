@@ -8,6 +8,7 @@
 - [ ] User role
 - [ ] Produk
 - [ ] Stok
+
 - [ ] Diskon
 - [ ] Transaksi
 - [ ] Input code (via barcode/smartphone)
