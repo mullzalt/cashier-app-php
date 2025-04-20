@@ -1,0 +1,62 @@
+CREATE DATABASE cashier_app;
+
+USE cashier_app;
+
+CREATE TABLE IF NOT EXISTS users (
+  id SERIAL PRIMARY KEY,
+  username VARCHAR(255) NOT NULL,
+  password_hashed TEXT NOT NULL,
+  role ENUM('admin', 'cashier') NOT NULL DEFAULT 'cashier',
+  UNIQUE (username)
+);
+
+CREATE TABLE IF NOT EXISTS products (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  code TEXT NOT NULL,
+  price DOUBLE NOT NULL DEFAULT 0,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS discounts (
+  id SERIAL,
+  product_id BIGINT UNSIGNED NOT NULL,
+  percentage DOUBLE NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY(id),
+  FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS taxes (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  percentage DOUBLE NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS transactions (
+  id SERIAL PRIMARY KEY,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  total_price DOUBLE NOT NULL DEFAULT 0, 
+  discount DOUBLE NOT NULL DEFAULT 0, 
+  tax_percentage DOUBLE NOT NULL DEFAULT 0, 
+  tax_price DOUBLE NOT NULL DEFAULT 0, 
+  net_price DOUBLE NOT NULL DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS transaction_details (
+  id SERIAL,
+  product_id BIGINT UNSIGNED NOT NULL,
+  transaction_id BIGINT UNSIGNED NOT NULL,
+  discount_percentage DOUBLE NOT NULL,
+  discount_price DOUBLE NOT NULL,
+  quantity INT NOT NULL,
+  sub_total INT NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  FOREIGN KEY (transaction_id) REFERENCES transactions(id) ON DELETE CASCADE,
+  FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+);
+
+
+

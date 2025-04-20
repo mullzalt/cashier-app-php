@@ -1,4 +1,3 @@
-
 <?php 
 
 require_once __DIR__ . "/query-builder.php";
@@ -14,13 +13,13 @@ function find_product_by_id($id){
 }
 
 function create_product($values){
-  return;
+  return insert("products", $values);
 }
 
 function update_product($id, $values){
-  return;
+  return update("products", $values, "id = $id");
 }
 
 function delete_product($id){
-  return;
+  return delete_("products", "id = $id");
 }
