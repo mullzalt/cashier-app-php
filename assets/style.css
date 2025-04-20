@@ -1,0 +1,51 @@
+body {
+  font-family: "Arial";
+}
+
+:root {
+  --background: oklch(98.4% 0.003 247.858);
+  --foreground: oklch(12.9% 0.042 264.695);
+  --primary: oklch(62.7% 0.194 149.214);
+}
+
+.navbar {
+  position: sticky;
+  display: flex;
+  flex-direction: row;
+  padding: 1em;
+  justify-content: space-between;
+}
+
+.btn {
+  text-decoration: none;
+  padding: 0.5em;
+  border: none;
+  border-radius: 5rad;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+}
+
+.btn-primary {
+  color: var(--background);
+  background-color: var(--primary);
+}
+
+.btn-primary:hover {
+  color: var(--background, 0.7);
+  background-color: var(--primary);
+}
+
+.navbar-items {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: end;
+  gap: 1em;
+}
+
+.navbar-logo {
+  font-weight: 600;
+  font-size: 16pt;
+}
