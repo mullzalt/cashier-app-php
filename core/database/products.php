@@ -12,6 +12,12 @@ function find_product_by_id($id){
   ]);
 }
 
+function find_product_by_code($code){
+  return find_first("products", [
+    "where" => "code = '$code'"
+  ]);
+}
+
 function create_product($values){
   return insert("products", $values);
 }

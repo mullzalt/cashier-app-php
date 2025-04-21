@@ -17,3 +17,14 @@ function get_post_values(){
   return $values;
   return array_map('to_html_special_chars', $values);
 }
+
+function on_form_search(callable $fn){}
+
+function on_form_submit(callable $fn){
+  if(empty($_POST)){
+    return;
+  }
+  $values = get_post_values();
+  $fn($values);
+}
+

@@ -1,11 +1,10 @@
 <?php
+  require_once __DIR__ . "/../../core/component.php";
   require_once __DIR__ . "/../../core/session.php";
   require_once __DIR__ . "/../../core/flasher.php";
   require_once __DIR__ . "/../../core/navigation.php";
   require_once __DIR__ . "/../../core/database/users.php";
   require_once __DIR__ . "/../../core/form.php";
-
-  include_once __DIR__ . "/../../templates/header.php";
 
   const WRONG_USERNAME_PASSWORD = "invalid_credential";
 
@@ -14,12 +13,7 @@
     redirect("/dashboard");
   }
 
-  function handle_login(){
-    if(empty($_POST)){
-      return;
-    }
-
-    $values = get_post_values();
+  function handle_login($values){
     $username = $values["username"];
     $password = $values["password"];
 
@@ -42,11 +36,15 @@
     redirect("/dashboard");
   }
 
-  handle_login();
+  on_form_submit('handle_login');
 
   $errors = get_all_flash_messages();
 
   clear_flash_messages();
+?>
+
+<?php 
+  render("/header");
 ?>
 
 <h1>Login Page</h1>
@@ -54,7 +52,7 @@
 <form method="post">
   <div>
     <label for="username">Username</label>
-    <input name="username" id="username" type="text" required/>
+    <input class="form-input" name="username" id="username" type="text" required/>
   </div>
   <div>
     <label for="password">Password</label>
@@ -64,3 +62,8 @@
   <button type="submit">Login</button>
 
 </form>
+
+
+<?php 
+  render("/footer");
+?>

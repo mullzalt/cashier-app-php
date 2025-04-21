@@ -1,11 +1,11 @@
 <?php
+  require_once __DIR__ . "/../../core/component.php";
   require_once __DIR__ . "/../../core/session.php";
   require_once __DIR__ . "/../../core/flasher.php";
   require_once __DIR__ . "/../../core/navigation.php";
   require_once __DIR__ . "/../../core/database/users.php";
   require_once __DIR__ . "/../../core/form.php";
 
-  include_once __DIR__ . "/../../templates/header.php";
 
   const USERNAME_ERROR = "invalid_username";
   const PASSWORD_ERROR = "invalid_password";
@@ -91,9 +91,9 @@
   clear_flash_messages();
 
 
-
-
 ?>
+
+<?php render("/header", ["title" => "Register"]); ?>
 
 <h1>Register Page</h1>
 
@@ -115,3 +115,6 @@
   <button type="submit">Register</button>
 
 </form>
+
+
+<?php render("/footer"); ?>

@@ -7,3 +7,4 @@ const DB_NAME = "cashier_app";
 
 const BASE_URL = "http://localhost:8080/routes";
 const ROOT = "http://localhost:8080";
+const BASE_DIR = __DIR__ . "/..";

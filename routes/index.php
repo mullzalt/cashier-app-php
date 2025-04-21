@@ -1,9 +1,14 @@
 <?php 
+  require_once __DIR__ . "/../core/component.php";
   require_once __DIR__ . "/../core/navigation.php";
-  include_once __DIR__ . "/../templates/header.php";
 ?>
 
-<div class="navbar">
+<?php 
+  render("/header");
+
+?>
+
+<div class="flex p-4 gap-4 justify-between">
   <div class="navbar-logo">APP NAME</div>
   <div class="navbar-items">
     <a class="btn btn-primary" href='<?=to("/login")?>'>Sign in</a>
@@ -14,5 +19,6 @@
 <h1>Hello from home!</h1>
 
 <?php 
-  include_once __DIR__ . "/../templates/footer.php";
+  render("/footer");
 ?>
+
