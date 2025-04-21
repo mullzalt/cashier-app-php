@@ -2,7 +2,11 @@
 require_once __DIR__ . "/../database.php";
 
 function column_parser($cols){
-  return "(". implode(", ", $cols).  ")" ;
+  return  "(". implode(", ", $cols).  ")" ;
+}
+
+function select_parser($cols){
+  return is_string($cols) ? $cols : implode(", ", $cols);
 }
 
 function value_parser($value){
@@ -32,7 +36,7 @@ function offset_parser($offset){
 }
 
 function find_many_query($table, $option = []) {
-  $select = $option["select"] ? column_parser($option["select"]) : "*";
+  $select = $option["select"] ? select_parser($option["select"]) : "*";
   $where = $option["where"] ? where_parser($option["where"]) : null;
   $join = $option["join"] ?? null;
   $limit = $option["limit"] ? limit_parser($option["limit"]) : null;
@@ -42,10 +46,11 @@ function find_many_query($table, $option = []) {
     $select,
     "FROM",
     $table,
-    $where,
     $join,
+    $where,
     $limit,
-    $offset
+    $offset,
+    ";"
   ];
 
   return implode(" ", array_filter($query));

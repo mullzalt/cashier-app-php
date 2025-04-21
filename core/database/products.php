@@ -14,7 +14,9 @@ function find_product_by_id($id){
 
 function find_product_by_code($code){
   return find_first("products", [
-    "where" => "code = '$code'"
+    "select" => ["products.id", "products.name", "products.price", "discounts.percentage as discount"],
+    "join" => "LEFT JOIN discounts ON discounts.product_id = products.id",
+    "where" => "products.code = '$code'",
   ]);
 }
 

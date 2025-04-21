@@ -55,6 +55,7 @@
       <th>Qty</th>
       <th>Price</th>
       <th>Discount</th>
+      <th></th>
       <th>Sub Total</th>
   
     </tr>
@@ -69,14 +70,6 @@
       <th></th>
       <th></th>
       <th></th>
-      <th>Discount</th>
-      <th id="total-discount">0</th>
-  </tr>
-  <tr>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
       <th></th>
       <th>Total Price:</th>
       <th id="total-price">0</th>
@@ -85,6 +78,17 @@
   </tfoot>
 
 </table>
+
+<form method="POST" id="checkout-form">
+  <div>
+    <label >Pay Ammount</label>
+    <input name="pay_ammount" id="pay_ammount" type="number" />
+  </div>
+    <label >Chage:</label>
+  <input type="text" id="money_change" readonly>
+  <button disabled id="checkout-button" type="submit">Checkout</button>
+</form>
+
 
 <script>
 
@@ -116,9 +120,18 @@
     $("#product-code").val(product.code);
     $("#product-name").val(product.name);
     $("#product-price").val(String(product.price));
-    $("#product-discount").val(String(10));
+    $("#product-discount").val(String(product.discount ?? 0));
     $("#product-qty").val("1");
     $("#search-btn").prop('disabled', false)
+  }
+
+  const calculateDiscount = (price, discount) => discount ? price * (discount / 100) : 0
+
+  const getDiscount = (product) => {
+    const price = Number(product.price ?? 0)
+    const discount = Number(product.discount)
+    const qty = Number(product.qty)
+    return calculateDiscount(price, discount) * qty;
   }
 
 
@@ -136,28 +149,35 @@
   return arr.map(({name, value}) => ({
       [name]: value
     })).reduce((acc, curr) => ({...acc, ...curr}), {})
-
-
-
   }
 
   $("#add-product").on("submit", (e) => {
     e.preventDefault()
     const product = parseSerialized($("#add-product").serializeArray())
-    handleAddProduct(product, 1)
     $("#search-code").val("")
     $("#search-code").trigger("focus")
     $("#search-btn").prop('disabled', true)
-    productsList.push(product)
+    $("#checkout").prop('disabled', false)
+
+    const updatedProduct = {
+    ...product, 
+      discount_price: getDiscount(product),
+      sub_total: getSubTotal(product)
+    }
+
+    handleAddProduct(updatedProduct, productsList.length)
+    
+    productsList.push(updatedProduct)
 
     handleUpdateProducts(productsList)
     clearSearchProduct()
   })
 
   const getSubTotal = (product) => {
+    const discount = getDiscount(product)
     const qty = Number(product.qty)
     const price = Number(product.price)
-    return (price * qty)
+    return (price * qty) - discount
   }
 
     const productRow = (product, idx) => `
@@ -167,21 +187,82 @@
       <td>${product.name}</td>
       <td>${product.qty}</td>
       <td>${parsePrice(product.price)}</td>
-      <td></td>
-      <td>${parsePrice(getSubTotal(product))}</td>
+      <td>${product.discount > 0 ? product.discount + "%" : "-"}</td>
+      <td>${parsePrice(product.discount_price)}</td>
+      <td>${parsePrice(product.sub_total)}</td>
       </tr>
     `
 
-    const parsePrice = (num) => new Intl
+    const parsePrice = (num) => num ? new Intl
       .NumberFormat("id-ID", { style: "currency", currency: "IDR"})
-      .format(num)
+      .format(num) : ""
 
     const handleUpdateProducts = (products) => {
-      const totalPrice = products.reduce((acc, curr) => 
-        acc + (curr.price * curr.qty)
+      const totalPrice = products.reduce((acc, {sub_total}) => 
+        acc + sub_total
         , 0 )
       $("#total-price").text(parsePrice(totalPrice))
     }
+
+  const handleCheckout =   (data) => {
+      return  postRequest('/routes/cashier/transactions/_checkout.php', {
+        json: data,
+        onSuccess: () => redirect("/routes/dashboard"),
+        onError: (e) => alert("Failed to insert transaction"),
+      }).then((res) => res)
+  }
+
+  const getTotalPrice = (products) => 
+      products
+      .map(({price, qty}) => price * qty)
+      .reduce((acc, curr) => acc + curr, 0)
+
+  const getTotalDiscount = (products) => 
+      products
+      .map(({discount_price}) => discount_price)
+      .reduce((acc, curr) => acc + curr, 0)
+
+  const getNetPrice = (products) => getTotalPrice(products) - getTotalDiscount(products)
+  
+  const getTransactionData = ({pay_ammount, money_change}) => {
+    const discount = getTotalDiscount(productsList);
+    const total_price = getTotalPrice(productsList);
+  
+    const net_price = getNetPrice(productsList);
+
+    const details = productsList.map((product) => ({
+      product_id: product.id,
+      discount_percentage: product.discount,
+      discount_price: product.discount_price,
+      quantity: product.qty,           
+      sub_total: product.sub_total          
+    }))
+
+    const transaction = { total_price, discount, net_price, pay_ammount, money_change }
+
+    return { transaction, details }
+  }
+
+  $("#pay_ammount").on('input', (e) => {
+    e.preventDefault()
+    const ammount = Number(e.target.value)
+    const total_price = getNetPrice(productsList)
+    const change = ammount - getNetPrice(productsList)
+    const isEmpty = productsList.length < 1
+
+    $("#checkout-button").prop("disabled", isEmpty || ammount < total_price )
+    $("#money_change").val(String(change))
+  })
+
+
+  $("#checkout-form").on('submit', async(e) => { 
+    e.preventDefault()
+    const pay_ammount = Number($("#pay_ammount").val())
+    const money_change = Number($("#money_change").val())
+    await handleCheckout(
+      getTransactionData({pay_ammount, money_change})
+    )}
+  )
 
   const handleAddProduct =(product, idx) => {
     $("#product-rows").append(productRow(product, idx))

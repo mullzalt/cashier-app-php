@@ -58,5 +58,8 @@ CREATE TABLE IF NOT EXISTS transaction_details (
   FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
 );
 
+ALTER TABLE transactions
+ADD pay_ammount DOUBLE NOT NULL DEFAULT 0,
+ADD money_change DOUBLE NOT NULL DEFAULT 0;
 
 
